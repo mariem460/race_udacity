@@ -1,7 +1,7 @@
 // PROVIDED CODE BELOW (LINES 1 - 80) DO NOT REMOVE
 
 // The store will hold all information needed globally
-var store = {
+let store = {
 	track_id: undefined,
 	player_id: undefined,
 	race_id: undefined,
@@ -104,7 +104,7 @@ async function handleCreateRace() {
 function runRace(raceID) {
 	return new Promise(resolve => {
 		// use Javascript's built in setInterval method to get race info every 500ms
-		var raceInterval = setInterval(async function() {
+		const raceInterval = setInterval(async function() {
 			const res = await getRace(raceID);
 			/* 
 				if the race info status property is "in-progress", update the leaderboard by calling:
@@ -141,7 +141,7 @@ async function runCountdown() {
 
 		return new Promise(resolve => {
 			// use Javascript's built in setInterval method to count down once per second
-			let interval = setInterval(function() {
+			const interval = setInterval(function() {
 				// run this DOM manipulation to decrement the countdown for the user
 				document.getElementById('big-numbers').innerHTML = --timer
 
@@ -297,7 +297,7 @@ function resultsView(positions) {
 }
 
 function raceProgress(positions) {
-	let userPlayer = positions.find(e => e.id === store.player_id)
+	const userPlayer = positions.find(e => e.id === store.player_id)
 	userPlayer.driver_name += " (you)"
 
 	positions = positions.sort((a, b) => (a.segment > b.segment) ? -1 : 1)
