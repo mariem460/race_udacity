@@ -78,54 +78,64 @@ async function delay(ms) {
 
 // This async function controls the flow of the race, add the logic and error handling
 async function handleCreateRace() {
-	// render starting UI
-	renderAt('#race', renderRaceStartView(store.track_id))
+	try {
+		// render starting UI
+		renderAt('#race', renderRaceStartView(store.track_id))
 
-	// Get player_id and track_id from the store
-	const {player_id, track_id} = store;
-	
-	// const race = invoke the API call to create the race, then save the result
-	const race = await createRace(player_id, track_id);
+		// Get player_id and track_id from the store
+		const {player_id, track_id} = store;
+		
+		// const race = invoke the API call to create the race, then save the result
+		const race = await createRace(player_id, track_id);
 
-	// update the store with the race id
-	updateStore({race_id: parseInt(race.ID) - 1});
+		// update the store with the race id
+		updateStore({race_id: parseInt(race.ID) - 1});
 
-	// The race has been created, now start the countdown
-	// call the async function runCountdown
-	await runCountdown();
+		// The race has been created, now start the countdown
+		// call the async function runCountdown
+		await runCountdown();
 
-	// call the async function startRace
-	await startRace(parseInt(race.ID) - 1);
+		// call the async function startRace
+		await startRace(parseInt(race.ID) - 1);
 
-	// call the async function runRace
-	await runRace(parseInt(race.ID) - 1);
+		// call the async function runRace
+		await runRace(parseInt(race.ID) - 1);
+	} catch(error) {
+		console.log("an error on handling create race")
+		console.log(error)
+	}
 }
 
 function runRace(raceID) {
 	return new Promise(resolve => {
 		// use Javascript's built in setInterval method to get race info every 500ms
 		const raceInterval = setInterval(async function() {
-			const res = await getRace(raceID);
-			/* 
-				if the race info status property is "in-progress", update the leaderboard by calling:
+			try {
+				const res = await getRace(raceID);
+				/* 
+					if the race info status property is "in-progress", update the leaderboard by calling:
 
-				renderAt('#leaderBoard', raceProgress(res.positions))
-			*/
-			if(res.status === "in-progress") {
-				renderAt('#leaderBoard', raceProgress(res.positions));
-			}
+					renderAt('#leaderBoard', raceProgress(res.positions))
+				*/
+				if(res.status === "in-progress") {
+					renderAt('#leaderBoard', raceProgress(res.positions));
+				}
 
-			/* 
-				if the race info status property is "finished", run the following:
+				/* 
+					if the race info status property is "finished", run the following:
 
-				clearInterval(raceInterval) // to stop the interval from repeating
-				renderAt('#race', resultsView(res.positions)) // to render the results view
-				reslove(res) // resolve the promise
-			*/
-			if(res.status === "finished") {
-				clearInterval(raceInterval) // to stop the interval from repeating
-				renderAt('#race', resultsView(res.positions)) // to render the results view
-				resolve(res) // resolve the promise
+					clearInterval(raceInterval) // to stop the interval from repeating
+					renderAt('#race', resultsView(res.positions)) // to render the results view
+					reslove(res) // resolve the promise
+				*/
+				if(res.status === "finished") {
+					clearInterval(raceInterval) // to stop the interval from repeating
+					renderAt('#race', resultsView(res.positions)) // to render the results view
+					resolve(res) // resolve the promise
+				}
+			} catch(error) {
+				console.log("an error when trying to get race")
+				console.log(error)
 			}
 		}, 500);
 	
@@ -194,7 +204,11 @@ function handleSelectTrack(target) {
 async function handleAccelerate() {
 	console.log("accelerate button clicked")
 	// Invoke the API call to accelerate
-	await accelerate(store.race_id);
+	try {
+		await accelerate(store.race_id);
+	} catch(error) {
+		console.log(error);
+	}
 }
 
 // HTML VIEWS ------------------------------------------------
